@@ -1,5 +1,3 @@
-hrm_monitor.py 
-  luuk@luuk-750XGK:~/Downloads$ cat heartrate_monitor.py
 import time
 import subprocess
 
@@ -17,14 +15,15 @@ def read_results():
 
 def parse_and_display(data):
     print("\033[H\033[J", end="")
-    print("=== MAX86915 S10 LIVE MONITOR ===")
+    print("=== MAX86917 S10 LIVE MONITOR ===")
     print(f"Time: {time.strftime('%H:%M:%S')}")
     print("Press Ctrl+C to stop\n")
     
+    # We voegen hier de blauwe kanalen netjes aan toe!
     patterns = [
-        "IR Mid DC Level", "RED Mid DC Level", "GREEN Mid DC Level", 
-        "IR High DC Level", "RED High DC Level", "GREEN High DC Level",
-        "GREEN Noise", "RED Noise"
+        "IR Mid DC Level", "RED Mid DC Level", "GREEN Mid DC Level", "BLUE Mid DC Level",
+        "IR High DC Level", "RED High DC Level", "GREEN High DC Level", "BLUE High DC Level",
+        "IR Noise", "RED Noise", "GREEN Noise", "BLUE Noise"
     ]
     
     for line in data.split(','):
@@ -53,5 +52,3 @@ if __name__ == "__main__":
         main()
     except KeyboardInterrupt:
         print("\nMonitor stopped.")
-luuk@luuk-750XGK:~/Downloads$ 
-
