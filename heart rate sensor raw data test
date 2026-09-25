@@ -1,0 +1,57 @@
+hrm_monitor.py 
+  luuk@luuk-750XGK:~/Downloads$ cat heartrate_monitor.py
+import time
+import subprocess
+
+SYSFS_PATH = "/sys/devices/virtual/sensors/hrm_sensor"
+
+def trigger_test():
+    subprocess.run(f"echo 1 > {SYSFS_PATH}/eol_test", shell=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+def read_results():
+    try:
+        with open(f"{SYSFS_PATH}/eol_test_result", "r") as f:
+            return f.read().strip()
+    except Exception as e:
+        return f"Error: {e}"
+
+def parse_and_display(data):
+    print("\033[H\033[J", end="")
+    print("=== MAX86915 S10 LIVE MONITOR ===")
+    print(f"Time: {time.strftime('%H:%M:%S')}")
+    print("Press Ctrl+C to stop\n")
+    
+    patterns = [
+        "IR Mid DC Level", "RED Mid DC Level", "GREEN Mid DC Level", 
+        "IR High DC Level", "RED High DC Level", "GREEN High DC Level",
+        "GREEN Noise", "RED Noise"
+    ]
+    
+    for line in data.split(','):
+        line = line.strip()
+        for p in patterns:
+            if p in line:
+                idx = data.split(',').index(p)
+                vals = data.split(',')[idx:idx+5]
+                print(f"- {p}: Status={vals[1]} | Value={vals[2]}")
+
+def main():
+    print("Starting sensor monitor... Place your finger on the sensor.")
+    time.sleep(1)
+    
+    while True:
+        trigger_test()
+        data = read_results()
+        if "MAIN" in data:
+            parse_and_display(data)
+        else:
+            print("Waiting for sensor response...")
+        time.sleep(0.5)
+
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\nMonitor stopped.")
+luuk@luuk-750XGK:~/Downloads$ 
+
